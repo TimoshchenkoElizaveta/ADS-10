@@ -7,7 +7,7 @@
 #include <vector>
 
 class Tree {
-private:
+ private:
     struct Nodule;
     std::vector<std::string> repl;
     Nodule* miss;
@@ -16,7 +16,7 @@ private:
 
     void perms(Nodule* miss, std::string symb);
 
-public:
+ public:
     explicit Tree(const std::vector<char>);
 
     std::string operator[](unsigned int i) const;
