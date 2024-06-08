@@ -2,26 +2,23 @@
 #ifndef INCLUDE_TREE_H_
 #define INCLUDE_TREE_H_
 
+#include <cstdint>
+#include <string>
 #include <vector>
 
 class Tree {
- public:
-    struct Node {
-        char data;
-        std::vector<Node*> children;
+private:
+    struct Nodule;
+    std::vector<std::string> repl;
+    Nodule* miss;
 
-        Node(char data) : data(data) {}
-    };
+    void createTree(Nodule* miss, std::vector<char> trail);
 
- private:
-    Node* root;
-    std::vector<std::vector<char>> permutations;
+    void perms(Nodule* miss, std::string symb);
 
-    void buildTree(Node* node, const std::vector<char>& elements);
-    void getPermutations(Node* node, std::vector<char>& currentPermutation);
+public:
+    explicit Tree(const std::vector<char>);
 
- public:
-    Tree(const std::vector<char>& elements);
-    std::vector<char> getPerm(int n);
+    std::string operator[](unsigned int i) const;
 };
 #endif  // INCLUDE_TREE_H_
