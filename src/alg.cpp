@@ -5,42 +5,66 @@
 #include  <cstdlib>
 #include  "tree.h"
 
-Tree::Tree(const std::vector<char>& elements) {
-    root = new Node(elements[0]);
-    buildTree(root, elements);
-    getPermutations(root, {elements[0]});
+std::vector<char> getPerm(const Tree& tree, int n) {
+    std::string perm_string = tree[n - 1];
+    std::vector<char> result(perm_string.begin(), perm_string.end());
+    return result;
 }
 
-void Tree::buildTree(Node* node, const std::vector<char>& elements) {
-    if (elements.size() <= 1) {
+struct Tree::Nodule {
+    char nvalue;
+    std::vector<Nodule*> newN;
+};
+
+void Tree::createTree(Nodule* miss, std::vector<char> trail) {
+    if (!trail.size()) {
         return;
     }
-
-    for (size_t i = 1; i < elements.size(); i++) {
-        std::vector<char> newElements = elements;
-        newElements.erase(newElements.begin() + i);
-        node->children.push_back(new Node(elements[i]));
-        buildTree(node->children.back(), newElements);
+    if (miss->nvalue != '*') {
+        for (auto i = trail.begin(); i < trail.end(); i++) {
+            if (*i == miss->nvalue) {
+                trail.erase(i);
+                break;
+            }
+        }
+    }
+    for (int i = 0; i < trail.size(); i++) {
+        miss->newN.push_back(new Nodule);
+    }
+    for (int i = 0; i < miss->newN.size(); i++) {
+        miss->newN[i]->nvalue = trail[i];
+    }
+    for (int i = 0; i < miss->newN.size(); i++) {
+        createTree(miss->newN[i], trail);
     }
 }
 
-void Tree::getPermutations(Node* node, std::vector<char>& currentPermutation) {
-    if (node->children.empty()) {
-        permutations.push_back(currentPermutation);
-        return;
+void Tree::perms(Nodule* parent, std::string symb = "") {
+    if (!parent->newN.size()) {
+        symb += parent->nvalue;
+        repl.push_back(symb);
     }
-
-    for (auto& child : node->children) {
-        currentPermutation.push_back(child->data);
-        getPermutations(child, currentPermutation);
-        currentPermutation.pop_back();
+    if (parent->nvalue != '*') {
+        symb += parent->nvalue;
+    }
+    for (int i = 0; i < parent->newN.size(); i++) {
+        perms(parent->newN[i], symb);
     }
 }
 
-std::vector<char> Tree::getPerm(int n) {
-    if (n > 0 && n <= permutations.size()) {
-        return permutations[n - 1];
-    } else {
-        return {};
+Tree::Tree(const std::vector<char> val) {
+    miss = new Nodule();
+    miss->nvalue = '*';
+    createTree(miss, val);
+    perms(miss);
+}
+
+std::string Tree::operator[](unsigned int i) const {
+    if (i >= repl.size()) {
+        return "";
     }
+    if (i < 0) {
+        throw std::string("Wrong index!!!");
+    }
+    return repl[i];
 }
